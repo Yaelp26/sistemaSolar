@@ -15,7 +15,7 @@ def handle_client(client_socket):
 
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('0.0.0.0', 80))
+    server.bind(('0.0.0.0', 5555))
     server.listen(5)
     print("[*] Server listening on port 5555")
 

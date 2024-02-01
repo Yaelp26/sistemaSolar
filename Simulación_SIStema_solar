@@ -28,15 +28,15 @@ def movimiento_planetas(t, y):
         xi, yi, vxi, vyi = y[i * 4:(i + 1) * 4]
         ax = 0
         ay = 0
-        for j in range(num_planetas):
-            if i != j:
-                xj, yj, _, _ = y[j * 4:(j + 1) * 4]
-                rij_x = xi - xj
-                rij_y = yi - yj
-                rij = np.sqrt(rij_x**2 + rij_y**2)
 
-                ax += (G * masa_sol * rij_x) / rij**3
-                ay += (G * masa_sol * rij_y) / rij**3
+        # Solo calculamos la interacción con el Sol, que asumimos está en el origen
+        rij_x = xi
+        rij_y = yi
+        rij = np.sqrt(rij_x**2 + rij_y**2)
+
+        # La aceleración debe ser negativa porque la fuerza gravitatoria es una fuerza de atracción.
+        ax -= (G * masa_sol * rij_x) / rij**3
+        ay -= (G * masa_sol * rij_y) / rij**3
 
         dydt[i * 4] = vxi
         dydt[i * 4 + 1] = vyi
@@ -55,7 +55,7 @@ for planeta, datos in datos_planetas.items():
 
 # Tiempo de simulación
 t_inicio = 0
-t_fin = 200 * 365 * 24 * 60 * 60  # Simulación de 200 años en segundos
+t_fin = 165 * 365 * 24 * 60 * 60  # Simulación de 200 años en segundos
 t_eval = np.linspace(t_inicio, t_fin, 10000)  # Aumentamos el número de puntos de evaluación en el tiempo
 
 # Realizar la simulación

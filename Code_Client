@@ -1,0 +1,39 @@
+import socket
+import threading
+
+def receive_messages(client_socket):
+    while True:
+        try:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            print(f"\nMensaje recibido del servidor: {data.decode('utf-8')}")
+        except socket.error as e:
+            print(f"Error al recibir datos: {e}")
+            break
+
+def send_messages(client_socket):
+    while True:
+        try:
+            message = input(
+                "Ingresa tu mensaje (o escribe 'exit' para salir): ")
+            client_socket.send(message.encode('utf-8'))
+            if message.lower() == 'exit':
+                client_socket.close()
+                break
+        except socket.error as e:
+            print(f"Error al enviar datos: {e}")
+            break
+
+def start_client():
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Actualiza con la IP y puerto de tu servidor
+    server_address = ('172.31.3.234', 5555)
+    client.connect(server_address)
+
+    # Inicia hilos separados para enviar y recibir mensajes
+    threading.Thread(target=receive_messages, args=(client,)).start()
+    threading.Thread(target=send_messages, args=(client,)).start()
+
+if __name__ == "__main__":
+    start_client()

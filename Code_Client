@@ -7,7 +7,16 @@ def receive_messages(client_socket):
             data = client_socket.recv(1024)
             if not data:
                 break
-            print(f"\nMensaje recibido del servidor: {data.decode('utf-8')}")
+            if data == b'FILE':
+                with open('received_file', 'wb') as f:
+                    while True:
+                        file_data = client_socket.recv(1024)
+                        if not file_data:
+                            break
+                        f.write(file_data)
+                print("\nArchivo recibido del servidor.")
+            else:
+                print(f"\nMensaje recibido del servidor: {data.decode('utf-8')}")
         except socket.error as e:
             print(f"Error al recibir datos: {e}")
             break
@@ -17,10 +26,20 @@ def send_messages(client_socket):
         try:
             message = input(
                 "Ingresa tu mensaje (o escribe 'exit' para salir): ")
-            client_socket.send(message.encode('utf-8'))
             if message.lower() == 'exit':
                 client_socket.close()
                 break
+            elif message.lower() == 'sendfile':
+                filename = input("Enter the filename to send: ")
+                if os.path.exists(filename):
+                    client_socket.sendall(b'FILE')
+                    with open(filename, 'rb') as f:
+                        bytes_to_send = f.read()
+                    client_socket.sendall(bytes_to_send)
+                else:
+                    print("File does not exist.")
+            else:
+                client_socket.send(message.encode('utf-8'))
         except socket.error as e:
             print(f"Error al enviar datos: {e}")
             break

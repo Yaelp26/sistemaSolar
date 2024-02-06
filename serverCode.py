@@ -1,6 +1,7 @@
 import socket
 import threading
 import sys
+import os
 
 def handle_client(client_socket):
     while True:
@@ -8,7 +9,16 @@ def handle_client(client_socket):
             data = client_socket.recv(1024)
             if not data:
                 break
-            print(f"Received message: {data.decode('utf-8')}")
+            if data == b'FILE':
+                with open('received_file', 'wb') as f:
+                    while True:
+                        file_data = client_socket.recv(1024)
+                        if not file_data:
+                            break
+                        f.write(file_data)
+                print("\nArchivo recibido del cliente.")
+            else:
+                print(f"Received message: {data.decode('utf-8')}")
         except socket.error as e:
             print(f"Error receiving data: {e}")
             break
@@ -42,7 +52,17 @@ def check_user_input(client_socket):
             if response.lower() == 'exit':
                 client_socket.close()
                 break
-            client_socket.send(response.encode('utf-8'))
+            elif response.lower() == 'sendfile':
+                filename = input("Enter the filename to send: ")
+                if os.path.exists(filename):
+                    client_socket.sendall(b'FILE')
+                    with open(filename, 'rb') as f:
+                        bytes_to_send = f.read()
+                    client_socket.sendall(bytes_to_send)
+                else:
+                    print("File does not exist.")
+            else:
+                client_socket.send(response.encode('utf-8'))
         except socket.error as e:
             print(f"Error sending data: {e}")
             break

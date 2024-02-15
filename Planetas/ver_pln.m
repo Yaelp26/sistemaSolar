@@ -46,7 +46,7 @@ end
 
 for k = 1:100:N
     plot(p1(:,1),p1(:,2),'k', p2(:,1),p2(:,2),'b',...
-         p1(k,1),p1(k,2),'ko',p2(k,1),p2(k,2),'bo')
+        p1(k,1),p1(k,2),'ko',p2(k,1),p2(k,2),'bo')
     % axis([-1 1 -1 1])
     grid on
     set(gca,'TickLabelInterpreter','latex')

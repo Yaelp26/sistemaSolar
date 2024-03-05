@@ -1,20 +1,25 @@
 import numpy as np
 
-def tres_planetas(X, m1, m2, m3):
-    XP = np.zeros(12)
+def tres_planetas(X, m1, m2, m3,m4):
+    XP = np.zeros(16)
     G = 6.672e-11
     
-    XP[0:6] = X[6:12]
+    XP[0:8] = X[8:16]
 
-    L12 = np.sqrt((X[2] - X[0])**2 + (X[3] - X[1])**2) + 1e-9
-    L13 = np.sqrt((X[4] - X[0])**2 + (X[5] - X[1])**2) + 1e-9
-    L23 = np.sqrt((X[4] - X[2])**2 + (X[5] - X[3])**2) + 1e-9
+    for i in range(4):
+        for j in range(i+1, 4):
+            dx = X[i*2] - X[j*2]
+            dy = X[i*2 + 1] - X[j*2 + 1]
+            rij = np.sqrt(dx**2 + dy**2) + 1e-9
+            rij_cube = rij ** 3
+            
+            F = G * (m1 * m2 / rij_cube) if i == 0 and j == 1 else G * (m1 * m3 / rij_cube) if i == 0 and j == 2 else G * (m1 * m4 / rij_cube) if i == 0 and j == 3 else \
+                G * (m2 * m3 / rij_cube) if i == 1 and j == 2 else G * (m2 * m4 / rij_cube) if i == 1 and j == 3 else \
+                G * (m3 * m4 / rij_cube)
 
-    XP[6] = G * m2 * (X[2] - X[0]) / (L12**3) + G * m3 * (X[4] - X[0]) / (L13**3)
-    XP[7] = G * m2 * (X[3] - X[1]) / (L12**3) + G * m3 * (X[5] - X[1]) / (L13**3)
-    XP[8] = G * m1 * (X[0] - X[2]) / (L12**3) + G * m3 * (X[4] - X[2]) / (L23**3)
-    XP[9] = G * m1 * (X[1] - X[3]) / (L12**3) + G * m3 * (X[5] - X[3]) / (L23**3)
-    XP[10] = G * m1 * (X[0] - X[4]) / (L13**3) + G * m2 * (X[2] - X[4]) / (L23**3)
-    XP[11] = G * m1 * (X[1] - X[5]) / (L13**3) + G * m2 * (X[3] - X[5]) / (L23**3)
+            XP[i*2 + 6] += F * dx
+            XP[i*2 + 7] += F * dy
+            XP[j*2 + 6] -= F * dx
+            XP[j*2 + 7] -= F * dy
 
     return XP
